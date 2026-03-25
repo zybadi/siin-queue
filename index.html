@@ -476,18 +476,12 @@
       const cur = g.id === currentId, dn = g.done;
       const qty = g.items.length;
 
-      // Smart item label: each unique item on its own line with quantity
+      // Smart item label: group same items with count
       const itemCounts = {};
-      const itemOrder = [];
-      g.items.forEach(it => {
-        if (!itemCounts[it.item]) itemOrder.push(it.item);
-        itemCounts[it.item] = (itemCounts[it.item]||0)+1;
-      });
-      const itemLines = itemOrder.map(name =>
-        itemCounts[name] > 1
-          ? `<span style="display:block;">${esc(name)} <span style="color:var(--blue);font-weight:700;">×${itemCounts[name]}</span></span>`
-          : `<span style="display:block;">${esc(name)}</span>`
-      ).join('');
+      g.items.forEach(it => { itemCounts[it.item] = (itemCounts[it.item]||0)+1; });
+      const itemStr = Object.entries(itemCounts)
+        .map(([name, cnt]) => cnt > 1 ? `${name} ×${cnt}` : name)
+        .join(', ');
 
       // Order IDs
       const ids = g.items.map(it => it.orderId).filter(Boolean);
@@ -509,7 +503,7 @@
           <div class="card-position">${i+1}</div>
           <div class="card-info">
             <div class="card-customer">${esc(g.customer)}</div>
-            <div class="card-item" style="display:flex;flex-direction:column;gap:3px;">${itemLines}</div>
+            <div class="card-item">${esc(itemStr)}</div>
             ${qty > 1 ? `<div class="card-qty">📦 ${qty} Orders</div>` : ''}
             <div class="card-meta">
               <div class="card-ids" style="display:flex;gap:4px;flex-wrap:wrap;">
@@ -597,22 +591,8 @@
     });
 
     // Append new groups after existing pending, before done
-    // Cross-page grouping: if the first new group's customer matches
-    // the last existing pending group, merge their items (same customer
-    // ordering across pages counts as one continuous group)
     const pending = queue.filter(g => !g.done);
     const done = queue.filter(g => g.done);
-
-    if (groups.length > 0 && pending.length > 0) {
-      const lastPending = pending[pending.length - 1];
-      const firstNew = groups[0];
-      if (lastPending.customer === firstNew.customer) {
-        // Merge first new group's items into the last pending group
-        lastPending.items.push(...firstNew.items);
-        groups.shift(); // remove the first group since it's now merged
-      }
-    }
-
     queue = [...pending, ...groups, ...done];
 
     save(); render(); playSound();
@@ -634,16 +614,13 @@
     // Lines to always skip — headers, labels, prices, statuses, order types
     const isJunk = l =>
       !l || l.length < 2 ||
-      /^(SAR\s|ITEM NAME|CUSTOMERS|DATES|TYPE|PRICE|PAYOUT|PAYMENT|SHIPPING|EARNING STATUS)/i.test(l) ||
-      /^(Order Date|Order Time|Order ID|Order No|Seller Hub|Home|Orders|Ratings|Cancelled|Shipments|Live Shows|OBS|Tutorial|Filter)/i.test(l) ||
-      /^(All|In Progress|Completed|Pending Shipping)$/.test(l) ||
-      /^(Buy now|Live Buy now|Chatting|Ripping|Paid|Delivered|Added To Wallet|Pending Shipping)/i.test(l) ||
-      /^\d{2}\/\d{2}\/\d{4}$/.test(l) ||    // bare date line
-      /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(l) || // bare time line
+      /^(SAR\s|ITEM NAME|CUSTOMERS|DATES|TYPE|PRICE|PAYOUT|PAYMENT|SHIPPING|EARNING|Order Date|Seller Hub|Home|Orders|Ratings|Cancelled|Pending|Shipments|Live Shows|OBS|Tutorial|Filter|All$|In Progress|Completed)/i.test(l) ||
+      /^(Buy now|Live Buy now|Chatting|Ripping|Shipping|Paid|Delivered|Added To Wallet|Pending Shipping)/i.test(l) ||
+      /^\d{2}\/\d{2}\/\d{4}$/.test(l) ||   // date only line
+      /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(l) || // time only line
       /^SAR\s*[\d.,]+/.test(l) ||               // price line
       /^[0-9]+ - [0-9]+ of [0-9]+/.test(l) ||   // pagination line
-      /^(Zybadi|LIVE QUEUE|LIVE ORDER|Import|Add Manually|Clear|Oldest|Newest)/i.test(l) || // our own app UI
-      l.length > 120;                             // too long
+      l.length > 100;                             // too long to be a name/item
 
     // Split entire page text into clean lines
     const allLines = text.split('\n').map(l => l.trim());
