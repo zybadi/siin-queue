@@ -14,93 +14,93 @@
     --done-bg: #0f1a14; --done-text: #3a4a3d;
   }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
 
-  header { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; border-bottom: 1px solid var(--border); background: rgba(13,15,14,0.95); backdrop-filter: blur(12px); flex-wrap: wrap; gap: 12px; }
+  header { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; border-bottom: 1px solid var(--border); background: rgba(13,15,14,0.97); backdrop-filter: blur(12px); flex-wrap: wrap; gap: 12px; }
   .logo { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--green); line-height: 1; }
   .logo span { color: var(--muted); font-size: 13px; letter-spacing: 2px; font-family: 'DM Mono', monospace; display: block; margin-top: 1px; }
   .header-stats { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
   .stat { text-align: center; }
   .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1; color: var(--green); }
-  .stat-num.amber { color: var(--amber); } .stat-num.red { color: var(--red); }
+  .stat-num.amber { color: var(--amber); } .stat-num.muted { color: var(--muted); }
   .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; font-family: 'DM Mono', monospace; }
   .stat-divider { width: 1px; height: 36px; background: var(--border); }
-  .btn-setup { background: rgba(62,255,160,0.08); border: 1px solid var(--green-dim); color: var(--green); padding: 7px 16px; border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: background 0.2s; }
-  .btn-setup:hover { background: rgba(62,255,160,0.18); }
 
-  .progress-wrap { height: 3px; background: var(--border); position: sticky; top: 73px; z-index: 9; }
+  .progress-wrap { height: 3px; background: var(--border); }
   .progress-bar { height: 100%; background: linear-gradient(90deg, var(--green), #00c97a); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 12px rgba(62,255,160,0.4); }
 
-  .add-section { position: relative; z-index: 5; padding: 20px 28px; border-bottom: 1px solid var(--border); background: var(--surface); }
-  .add-section h2 { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 12px; }
-  .add-form { display: flex; gap: 10px; flex-wrap: wrap; }
-  .add-form input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 14px; border-radius: 8px; outline: none; transition: border-color 0.2s; }
-  .add-form input:focus { border-color: var(--green-dim); }
-  .add-form input::placeholder { color: var(--muted); }
-  .input-customer { flex: 1; min-width: 130px; } .input-item { flex: 2; min-width: 180px; } .input-notes { flex: 3; min-width: 200px; }
-  .btn-add { background: var(--green); color: #0a0f0c; border: none; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; padding: 0 22px; border-radius: 8px; cursor: pointer; transition: transform 0.1s, opacity 0.2s; white-space: nowrap; }
-  .btn-add:hover { opacity: 0.9; } .btn-add:active { transform: scale(0.97); }
-  .bookmarklet-hint { margin-top: 10px; padding: 10px 14px; background: rgba(62,255,160,0.05); border: 1px solid rgba(62,255,160,0.15); border-radius: 8px; font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 8px; }
-  .bookmarklet-hint .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; animation: pulse 2s infinite; }
+  /* SYNC SECTION */
+  .sync-section { position: relative; z-index: 5; padding: 20px 28px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .sync-title { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 12px; }
+
+  .sync-steps { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .step-pill { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .step-pill .num { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--green); line-height: 1; }
+  .step-arrow { color: var(--border); font-size: 18px; }
+
+  .paste-area-wrap { position: relative; }
+  .paste-area { width: 100%; min-height: 48px; max-height: 80px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 12px 14px; resize: none; outline: none; transition: border-color 0.2s; overflow: hidden; }
+  .paste-area:focus { border-color: var(--green-dim); }
+  .paste-area::placeholder { color: var(--muted); font-size: 13px; }
+
+  .sync-row { display: flex; gap: 10px; align-items: stretch; margin-top: 10px; }
+  .btn-sync { background: var(--green); color: #0a0f0c; border: none; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; padding: 0 24px; border-radius: 8px; cursor: pointer; transition: transform 0.1s, opacity 0.2s; white-space: nowrap; height: 44px; }
+  .btn-sync:hover { opacity: 0.9; } .btn-sync:active { transform: scale(0.97); }
+  .sync-hint { flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(62,255,160,0.05); border: 1px solid rgba(62,255,160,0.12); border-radius: 8px; font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .sync-hint .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .queue-section { flex: 1; position: relative; z-index: 5; padding: 24px 28px; }
-  .queue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .queue-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--muted); }
-  .btn-clear-done { font-size: 11px; letter-spacing: 1px; color: var(--muted); background: none; border: 1px solid var(--border); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'DM Mono', monospace; transition: color 0.2s, border-color 0.2s; }
-  .btn-clear-done:hover { color: var(--red); border-color: var(--red); }
-  .queue-list { display: flex; flex-direction: column; gap: 10px; }
+  /* ADD MANUAL */
+  .add-section { position: relative; z-index: 5; padding: 16px 28px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .add-section h2 { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+  .add-form { display: flex; gap: 10px; flex-wrap: wrap; }
+  .add-form input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 9px 14px; border-radius: 8px; outline: none; transition: border-color 0.2s; height: 40px; }
+  .add-form input:focus { border-color: var(--green-dim); }
+  .add-form input::placeholder { color: var(--muted); }
+  .input-customer { flex: 1; min-width: 120px; } .input-item { flex: 2; min-width: 160px; } .input-notes { flex: 2; min-width: 160px; }
+  .btn-add { background: var(--surface2); color: var(--green); border: 1px solid var(--green-dim); font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; padding: 0 18px; border-radius: 8px; cursor: pointer; transition: background 0.2s; height: 40px; }
+  .btn-add:hover { background: rgba(62,255,160,0.1); }
 
-  .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.2s, opacity 0.3s; animation: slideIn 0.35s cubic-bezier(0.4,0,0.2,1); }
-  @keyframes slideIn { from{transform:translateY(-12px);opacity:0} to{transform:translateY(0);opacity:1} }
-  .order-card.current { border-color: var(--green); box-shadow: 0 0 0 1px var(--green), 0 0 24px rgba(62,255,160,0.12); }
-  .order-card.done { background: var(--done-bg); border-color: #1a201c; opacity: 0.5; }
+  /* QUEUE */
+  .queue-section { flex: 1; position: relative; z-index: 5; padding: 20px 28px; }
+  .queue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .queue-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--muted); }
+  .btn-clear-done { font-size: 11px; color: var(--muted); background: none; border: 1px solid var(--border); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'DM Mono', monospace; transition: color 0.2s, border-color 0.2s; }
+  .btn-clear-done:hover { color: var(--red); border-color: var(--red); }
+  .queue-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .order-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+  @keyframes slideIn { from{transform:translateY(-10px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .order-card.current { border-color: var(--green); box-shadow: 0 0 0 1px var(--green), 0 0 20px rgba(62,255,160,0.1); }
+  .order-card.done { background: var(--done-bg); border-color: #1a201c; opacity: 0.45; }
   .current-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--green); color: #061009; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px 3px 7px; border-radius: 0 0 8px 0; width: fit-content; }
   .current-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:#061009; animation: pulse 1s infinite; }
-  .card-body { display: flex; align-items: center; gap: 16px; padding: 16px 18px; }
-  .card-position { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--border); line-height: 1; min-width: 32px; text-align: center; }
+  .card-body { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+  .card-position { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--border); line-height: 1; min-width: 28px; text-align: center; }
   .order-card.current .card-position { color: var(--green); } .order-card.done .card-position { color: #1e2820; }
   .card-info { flex: 1; min-width: 0; }
-  .card-customer { font-size: 13px; font-weight: 500; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .card-customer { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 2px; }
   .order-card.current .card-customer { color: var(--green); } .order-card.done .card-customer { color: var(--done-text); }
-  .card-item { font-size: 18px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-item { font-size: 17px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .order-card.done .card-item { color: var(--done-text); text-decoration: line-through; }
-  .card-notes { font-size: 12px; color: var(--amber); margin-top: 5px; font-family: 'DM Mono', monospace; }
-  .order-card.done .card-notes { color: var(--done-text); }
-  .card-order-id { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; opacity: 0.6; margin-top: 2px; }
-  .card-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-  .btn-icon { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: color 0.2s, border-color 0.2s, background 0.2s; font-family: 'DM Sans', sans-serif; }
+  .card-notes { font-size: 11px; color: var(--amber); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  .card-order-id { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; opacity: 0.5; margin-top: 1px; }
+  .order-card.done .card-notes, .order-card.done .card-order-id { color: var(--done-text); }
+  .card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .btn-icon { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: color 0.2s, border-color 0.2s; font-family: 'DM Sans', sans-serif; }
   .btn-icon:hover { color: var(--text); border-color: var(--muted); }
-  .btn-done { background: rgba(62,255,160,0.08); border-color: var(--green-dim); color: var(--green); width: auto; padding: 0 14px; font-size: 13px; }
+  .btn-done { background: rgba(62,255,160,0.08); border-color: var(--green-dim); color: var(--green); width: auto; padding: 0 12px; font-size: 12px; }
   .btn-done:hover { background: rgba(62,255,160,0.18) !important; }
   .order-card.done .btn-done { background: transparent; border-color: var(--border); color: var(--done-text); }
   .btn-remove:hover { color: var(--red) !important; border-color: var(--red) !important; }
 
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-  .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
-  .empty-state p { font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 1px; line-height: 1.8; }
+  .empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.3; }
+  .empty-state p { font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.8; }
 
-  /* MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); padding: 20px; }
-  .modal-overlay.active { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 580px; width: 100%; box-shadow: 0 24px 80px rgba(0,0,0,0.6); max-height: 90vh; overflow-y: auto; }
-  .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: var(--green); margin-bottom: 8px; }
-  .modal > p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
-  .step { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 18px; }
-  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--green); line-height: 1; min-width: 20px; }
-  .step-text { font-size: 13px; color: var(--text); line-height: 1.7; }
-  .step-text strong { color: var(--green); }
-  .drag-link { display: inline-flex; align-items: center; gap: 8px; background: var(--green); color: #061009; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 2px; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin: 10px 0 4px; cursor: grab; }
-  .drag-hint { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
-  .modal-section { margin: 20px 0; padding: 16px; background: var(--surface2); border-radius: 10px; border: 1px solid var(--border); }
-  .modal-section h3 { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
-  .modal-close { margin-top: 20px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); padding: 11px 20px; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; transition: color 0.2s; width: 100%; }
-  .modal-close:hover { color: var(--text); }
-
-  /* TOAST */
-  .toast { position: fixed; bottom: 28px; right: 28px; background: var(--green); color: #061009; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; padding: 12px 20px; border-radius: 10px; z-index: 200; transform: translateY(80px); opacity: 0; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s; pointer-events: none; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--green); color: #061009; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; padding: 11px 18px; border-radius: 10px; z-index: 200; transform: translateY(80px); opacity: 0; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s; pointer-events: none; }
   .toast.show { transform: translateY(0); opacity: 1; }
   .toast.warn { background: var(--amber); }
+  .toast.err { background: var(--red); color: #fff; }
 </style>
 </head>
 <body>
@@ -112,9 +112,7 @@
     <div class="stat-divider"></div>
     <div class="stat"><div class="stat-num amber" id="stat-total">0</div><div class="stat-label">Total</div></div>
     <div class="stat-divider"></div>
-    <div class="stat"><div class="stat-num red" id="stat-done">0</div><div class="stat-label">Done</div></div>
-    <div class="stat-divider"></div>
-    <button class="btn-setup" onclick="showModal()">⚙ BOOKMARKLET SETUP</button>
+    <div class="stat"><div class="stat-num muted" id="stat-done">0</div><div class="stat-label">Done</div></div>
   </div>
 </header>
 
@@ -122,6 +120,26 @@
   <div class="progress-bar" id="progress-bar" style="width:0%"></div>
 </div>
 
+<!-- SYNC SECTION -->
+<div class="sync-section">
+  <div class="sync-title">📋 Import from Siin Orders Page</div>
+  <div class="sync-steps">
+    <div class="step-pill"><span class="num">1</span> Go to hub.siin.shop/seller-dashboard/orders &amp; refresh</div>
+    <div class="step-arrow">→</div>
+    <div class="step-pill"><span class="num">2</span> Press ⌘A then ⌘C to copy the page</div>
+    <div class="step-arrow">→</div>
+    <div class="step-pill"><span class="num">3</span> Click Import below</div>
+  </div>
+  <div class="sync-row">
+    <button class="btn-sync" onclick="importFromClipboard()">⬇ IMPORT FROM CLIPBOARD</button>
+    <div class="sync-hint">
+      <div class="dot"></div>
+      <span>Only new orders (by order ID) will be added — no duplicates.</span>
+    </div>
+  </div>
+</div>
+
+<!-- MANUAL ADD -->
 <div class="add-section">
   <h2>➕ Add Order Manually</h2>
   <div class="add-form">
@@ -130,59 +148,15 @@
     <input class="input-notes" id="inp-notes" placeholder="Notes (optional)" />
     <button class="btn-add" onclick="addOrderManual()">ADD</button>
   </div>
-  <div class="bookmarklet-hint">
-    <div class="dot"></div>
-    <span>Bookmarklet active — click it on hub.siin.shop after refreshing to auto-import new orders here.</span>
-  </div>
 </div>
 
+<!-- QUEUE -->
 <div class="queue-section">
   <div class="queue-header">
     <div class="queue-title">LIVE QUEUE</div>
     <button class="btn-clear-done" onclick="clearDone()">Clear Completed</button>
   </div>
   <div class="queue-list" id="queue-list"></div>
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal" onclick="if(event.target===this)hideModal()">
-  <div class="modal">
-    <h2>📥 BOOKMARKLET SETUP</h2>
-    <p>The bookmarklet lets you push orders from hub.siin.shop into this queue with one click — no copy-pasting. Here's how to set it up:</p>
-
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-text">Show your browser's bookmarks bar if it's hidden:<br><strong>Chrome / Edge:</strong> Press Ctrl+Shift+B (or Cmd+Shift+B on Mac)</div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-text">Drag this button into your bookmarks bar:</div>
-    </div>
-    <div style="margin-left:34px; margin-bottom:16px;">
-      <a class="drag-link" id="bookmarklet-link" href="PLACEHOLDER">📥 Push to Queue</a>
-      <div class="drag-hint">↑ drag this into your bookmarks bar</div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-text">During your stream, open <strong>hub.siin.shop</strong> in another tab. When you want to update the queue, <strong>refresh that tab</strong>, then click <strong>"📥 Push to Queue"</strong> in your bookmarks bar. New orders will appear here instantly with a sound alert.</div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-text">Keep <strong>this queue tab open</strong> at all times. The bookmarklet sends data directly to it using the browser's built-in messaging.</div>
-    </div>
-
-    <div class="modal-section">
-      <h3>⚠ If the bookmarklet doesn't detect orders</h3>
-      <p style="font-size:13px; color:var(--muted); line-height:1.7;">
-        Hub.siin.shop may use a structure the bookmarklet doesn't recognize yet. In that case, just use the <strong style="color:var(--text)">manual Add form</strong> above — you type the customer name + item from the chat or orders page. It takes about 3 seconds per order and works perfectly.
-      </p>
-    </div>
-
-    <button class="modal-close" onclick="hideModal()">Got it, close</button>
-  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -194,32 +168,30 @@
   function playSound() {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      [[880, 0], [1108, 0.13]].forEach(([freq, delay]) => {
+      [[880,0],[1108,0.13]].forEach(([freq,delay]) => {
         const o = ctx.createOscillator(), g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
         o.frequency.value = freq; o.type = 'sine';
         const t = ctx.currentTime + delay;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.18, t + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-        o.start(t); o.stop(t + 0.5);
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.18, t+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t+0.45);
+        o.start(t); o.stop(t+0.5);
       });
     } catch(e) {}
   }
 
-  function showToast(msg, warn) {
+  function showToast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg;
-    t.className = 'toast' + (warn ? ' warn' : '') + ' show';
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+    t.className = 'toast' + (type ? ' '+type : '') + ' show';
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 3000);
   }
 
   function save() { localStorage.setItem('siinQueue', JSON.stringify(queue)); }
 
-  function esc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function render() {
     const list = document.getElementById('queue-list');
@@ -228,17 +200,17 @@
     document.getElementById('stat-total').textContent = queue.length;
     document.getElementById('stat-pending').textContent = pending.length;
     document.getElementById('stat-done').textContent = done.length;
-    const pct = queue.length ? Math.round(done.length / queue.length * 100) : 0;
-    document.getElementById('progress-bar').style.width = pct + '%';
+    const pct = queue.length ? Math.round(done.length/queue.length*100) : 0;
+    document.getElementById('progress-bar').style.width = pct+'%';
 
     if (!queue.length) {
-      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>No orders yet.<br>Add manually or use the bookmarklet<br>on hub.siin.shop</p></div>`;
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>No orders yet.<br>Copy your Siin orders page and click Import,<br>or add manually below.</p></div>`;
       return;
     }
 
     const currentId = pending.length ? pending[0].id : null;
-    list.innerHTML = queue.map((o, i) => {
-      const cur = o.id === currentId, dn = o.done;
+    list.innerHTML = queue.map((o,i) => {
+      const cur = o.id===currentId, dn = o.done;
       return `<div class="order-card${cur?' current':''}${dn?' done':''}" id="card-${o.id}">
         ${cur ? '<div class="current-tag">NOW SERVING</div>' : ''}
         <div class="card-body">
@@ -250,118 +222,159 @@
             ${o.orderId ? `<div class="card-order-id">#${esc(o.orderId)}</div>` : ''}
           </div>
           <div class="card-actions">
-            ${!dn ? `<button class="btn-icon btn-up" onclick="move('${o.id}',-1)" title="Move up">↑</button>
-            <button class="btn-icon btn-down" onclick="move('${o.id}',1)" title="Move down">↓</button>` : ''}
-            <button class="btn-icon btn-done" onclick="toggleDone('${o.id}')">${dn ? '↩ Undo' : '✓ Done'}</button>
-            <button class="btn-icon btn-remove" onclick="remove('${o.id}')" title="Remove">✕</button>
+            ${!dn ? `<button class="btn-icon" onclick="move('${o.id}',-1)" title="Move up">↑</button>
+            <button class="btn-icon" onclick="move('${o.id}',1)" title="Move down">↓</button>` : ''}
+            <button class="btn-icon btn-done" onclick="toggleDone('${o.id}')">${dn?'↩ Undo':'✓ Done'}</button>
+            <button class="btn-icon btn-remove" onclick="removeOrder('${o.id}')" title="Remove">✕</button>
           </div>
         </div>
       </div>`;
     }).join('');
   }
 
+  // ── IMPORT FROM CLIPBOARD ──
+  async function importFromClipboard() {
+    let text = '';
+    try {
+      text = await navigator.clipboard.readText();
+    } catch(e) {
+      showToast('⚠ Could not read clipboard. Allow clipboard access when prompted.', 'warn');
+      return;
+    }
+
+    if (!text || text.length < 50) {
+      showToast('⚠ Clipboard is empty or too short. Copy the full page first.', 'warn');
+      return;
+    }
+
+    const orders = parseOrders(text);
+
+    if (!orders.length) {
+      showToast('⚠ No orders detected. Make sure you copied the full orders page.', 'warn');
+      return;
+    }
+
+    let added = 0;
+    orders.forEach(o => {
+      const exists = o.orderId && queue.some(q => q.orderId === o.orderId);
+      if (!exists) {
+        queue.push({ id: uid(), customer: o.customer, item: o.item, notes: '', orderId: o.orderId, done: false, ts: Date.now() });
+        added++;
+      }
+    });
+
+    if (added > 0) {
+      save(); render(); playSound();
+      showToast(`✓ ${added} new order${added>1?'s':''} imported!`);
+    } else {
+      showToast('ℹ No new orders — all already in queue.', 'warn');
+    }
+  }
+
+  // ── PARSE ORDERS FROM PAGE TEXT ──
+  function parseOrders(text) {
+    const orders = [];
+    const seen = {};
+
+    // Strategy 1: Extract from JSON data-page attribute (Siin embeds all data as JSON in the page)
+    // Look for the orders array in the JSON
+    try {
+      const jsonMatch = text.match(/"data"\s*:\s*\[(\{[\s\S]*?\})\]/);
+      if (jsonMatch) {
+        // Try to find order patterns in embedded JSON
+        const orderMatches = text.matchAll(/"product_name"\s*:\s*"([^"]+)"[\s\S]*?"buyer_name"\s*:\s*"([^"]+)"[\s\S]*?"order_id"\s*:\s*"?(\d+)"?/g);
+        for (const m of orderMatches) {
+          const key = m[3] || m[1]+'|'+m[2];
+          if (!seen[key]) { seen[key]=true; orders.push({item:m[1], customer:m[2], orderId:m[3]||''}); }
+        }
+      }
+    } catch(e) {}
+
+    // Strategy 2: Parse plain text from copied page
+    // The copied text of Siin's orders table looks like:
+    // "Item Name\nDestined Rivals Booster Bundle\n#3432108\nCustomer\nvideogames 🇰🇼\n..."
+    // Split by order ID pattern (#XXXXXXX) to find blocks
+    if (!orders.length) {
+      // Find all order IDs in the text
+      const idMatches = [...text.matchAll(/#(\d{5,})/g)];
+      idMatches.forEach((idMatch, idx) => {
+        const oid = idMatch[1];
+        if (seen[oid]) return;
+        // Get surrounding text (300 chars before and after the order ID)
+        const pos = idMatch.index;
+        const chunk = text.substring(Math.max(0, pos-300), pos+100);
+        const lines = chunk.split('\n').map(l => l.trim()).filter(l => l && l.length > 1 && l.length < 100);
+
+        // Item name is usually just before the order ID in the chunk
+        // Customer is usually after
+        let item = '', customer = '';
+
+        // Look backwards for item name (non-ID, non-date line)
+        for (let i = lines.length-1; i >= 0; i--) {
+          const l = lines[i];
+          if (/#\d+/.test(l)) continue;
+          if (/^\d{2}\/\d{2}\/\d{4}/.test(l)) continue;
+          if (/^(SAR|Item|Customer|Date|Type|Price|Payout|Payment|Ship|Earn|All|Pending|Completed|Filter|Orders)/i.test(l)) continue;
+          if (l.length > 3) { item = l; break; }
+        }
+
+        // Look in text after order ID for customer (username pattern)
+        const afterChunk = text.substring(pos, pos+400);
+        const afterLines = afterChunk.split('\n').map(l => l.trim()).filter(l => l && l.length > 1 && l.length < 60);
+        for (let i = 1; i < afterLines.length; i++) {
+          const l = afterLines[i];
+          if (/#\d+/.test(l)) break; // hit next order
+          if (/^\d{2}\/\d{2}\/\d{4}/.test(l)) continue;
+          if (/^(SAR|Buy|Live|Chat|Paid|Delivered|Added|Pending|In Progress)/i.test(l)) continue;
+          if (l.length > 2) { customer = l; break; }
+        }
+
+        if (item) {
+          seen[oid] = true;
+          orders.push({ item, customer: customer||'?', orderId: oid });
+        }
+      });
+    }
+
+    return orders;
+  }
+
   function addOrderManual() {
     const c = document.getElementById('inp-customer').value.trim();
     const it = document.getElementById('inp-item').value.trim();
     const n = document.getElementById('inp-notes').value.trim();
-    if (!c || !it) { showToast('⚠ Fill customer + item', true); return; }
-    addOrder({ customer: c, item: it, notes: n, orderId: '' });
-    ['inp-customer','inp-item','inp-notes'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('inp-customer').focus();
-  }
-
-  function addOrder({ customer, item, notes, orderId }) {
-    if (orderId && queue.some(o => o.orderId === orderId)) return false;
-    queue.push({ id: uid(), customer, item, notes: notes||'', orderId: orderId||'', done: false, ts: Date.now() });
+    if (!c || !it) { showToast('⚠ Fill customer + item', 'warn'); return; }
+    queue.push({ id: uid(), customer: c, item: it, notes: n, orderId: '', done: false, ts: Date.now() });
     save(); render(); playSound();
-    showToast(`✓ Added: ${customer}`);
-    return true;
+    ['inp-customer','inp-item','inp-notes'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('inp-customer').focus();
+    showToast(`✓ Added: ${c}`);
   }
 
   function toggleDone(id) {
-    const o = queue.find(x => x.id === id); if (!o) return;
+    const o = queue.find(x => x.id===id); if (!o) return;
     o.done = !o.done;
     if (o.done) queue = [...queue.filter(x => x.id!==id && !x.done), ...queue.filter(x => x.id!==id && x.done), o];
     save(); render();
   }
 
-  function remove(id) { queue = queue.filter(x => x.id !== id); save(); render(); }
+  function removeOrder(id) { queue = queue.filter(x => x.id!==id); save(); render(); }
 
   function move(id, dir) {
     const p = queue.filter(o => !o.done), dn = queue.filter(o => o.done);
-    const i = p.findIndex(o => o.id === id);
-    const j = i + dir;
-    if (j < 0 || j >= p.length) return;
-    [p[i], p[j]] = [p[j], p[i]];
-    queue = [...p, ...dn];
-    save(); render();
+    const i = p.findIndex(o => o.id===id), j = i+dir;
+    if (j<0||j>=p.length) return;
+    [p[i],p[j]]=[p[j],p[i]];
+    queue=[...p,...dn]; save(); render();
   }
 
-  function clearDone() { queue = queue.filter(o => !o.done); save(); render(); showToast('Cleared completed orders'); }
+  function clearDone() { queue=queue.filter(o=>!o.done); save(); render(); showToast('Cleared completed orders'); }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && ['inp-customer','inp-item','inp-notes'].includes(e.target.id)) addOrderManual();
+    if (e.key==='Enter' && ['inp-customer','inp-item','inp-notes'].includes(e.target.id)) addOrderManual();
   });
 
-  // ── BOOKMARKLET ──
-  // This script runs on hub.siin.shop and scrapes the orders page
-  const bm = `javascript:(function(){
-alert('Bookmarklet is running!'); var ch=new BroadcastChannel('siin_queue');var orders=[];
-var seen={};
-
-// Target exact Siin HTML structure:
-// Each row is a <tr> in tbody
-// Col 0 td: item name in <p class="...text-black..."> and order id in <p class="...text-secondary-300...">
-// Col 1 td: customer name in <p class="...text-dark-100...">
-var rows=document.querySelectorAll('tbody tr');
-rows.forEach(function(r){
-  var tds=r.querySelectorAll('td');
-  if(tds.length<2) return;
-  // Item name: first <p> inside col 0 that has font-medium and text-black
-  var itemEl=tds[0].querySelector('p.font-medium');
-  var item=(itemEl?itemEl.innerText:'').trim();
-  if(!item) return;
-  // Order ID: <p> with text-secondary-300 inside col 0
-  var oidEl=tds[0].querySelector('p.text-secondary-300, p.text-gray-400');
-  var oid=(oidEl?oidEl.innerText:'').replace(/[^0-9]/g,'');
-  // Customer: last <p> inside col 1
-  var custEl=tds[1].querySelector('p.font-medium');
-  var customer=(custEl?custEl.innerText:'?').trim();
-  // Deduplicate by order ID
-  var key=oid||item+'|'+customer;
-  if(seen[key]) return;
-  seen[key]=true;
-  orders.push({item:item,customer:customer,orderId:oid,notes:''});
-});
-
-if(!orders.length){
-  alert('No orders found.\\nMake sure you are on hub.siin.shop/seller-dashboard/orders and the page has loaded fully.');
-  return;
-}
-ch.postMessage({type:'SIIN_ORDERS',orders:orders});
-alert('✓ Sent '+orders.length+' order(s) to your queue tab!');
-})();`;
-
-  document.getElementById('bookmarklet-link').href = bm;
-
-  // Listen for orders pushed from the bookmarklet
-  const channel = new BroadcastChannel('siin_queue');
-  channel.onmessage = (e) => {
-    if (!e.data || e.data.type !== 'SIIN_ORDERS') return;
-    let added = 0;
-    e.data.orders.forEach(o => { if (addOrder(o)) added++; });
-    if (added > 0) showToast(`✓ ${added} new order${added>1?'s':''} imported!`);
-    else showToast('ℹ No new orders found', true);
-  };
-
-  function showModal() { document.getElementById('modal').classList.add('active'); }
-  function hideModal() { document.getElementById('modal').classList.remove('active'); }
-
   render();
-  if (!localStorage.getItem('siinSeenSetup')) {
-    setTimeout(showModal, 500);
-    localStorage.setItem('siinSeenSetup', '1');
-  }
 </script>
 </body>
 </html>
