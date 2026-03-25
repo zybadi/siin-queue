@@ -78,13 +78,19 @@
   .card-position { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--border); line-height: 1; min-width: 28px; text-align: center; }
   .order-card.current .card-position { color: var(--green); } .order-card.done .card-position { color: #1e2820; }
   .card-info { flex: 1; min-width: 0; }
-  .card-customer { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 2px; }
+  .card-customer { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 3px; letter-spacing: 0.2px; }
   .order-card.current .card-customer { color: var(--green); } .order-card.done .card-customer { color: var(--done-text); }
-  .card-item { font-size: 17px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-item { font-size: 13px; font-weight: 400; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .order-card.current .card-item { color: var(--text); }
   .order-card.done .card-item { color: var(--done-text); text-decoration: line-through; }
-  .card-notes { font-size: 11px; color: var(--amber); margin-top: 4px; font-family: 'DM Mono', monospace; }
-  .card-order-id { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; opacity: 0.5; margin-top: 1px; }
-  .order-card.done .card-notes, .order-card.done .card-order-id { color: var(--done-text); }
+  .card-meta { display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap; }
+  .card-order-id { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; background: var(--surface2); border: 1px solid var(--border); padding: 2px 7px; border-radius: 4px; }
+  .order-card.current .card-order-id { border-color: var(--green-dim); color: var(--green); }
+  .order-card.done .card-order-id { color: var(--done-text); border-color: var(--border); }
+  .card-datetime { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .order-card.done .card-datetime { color: var(--done-text); }
+  .card-notes { font-size: 11px; color: var(--amber); font-family: 'DM Mono', monospace; }
+  .order-card.done .card-notes { color: var(--done-text); }
   .card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
   .btn-icon { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: color 0.2s, border-color 0.2s; font-family: 'DM Sans', sans-serif; }
   .btn-icon:hover { color: var(--text); border-color: var(--muted); }
@@ -219,7 +225,10 @@
             <div class="card-customer">${esc(o.customer)}</div>
             <div class="card-item">${esc(o.item)}</div>
             ${o.notes ? `<div class="card-notes">📝 ${esc(o.notes)}</div>` : ''}
-            ${o.orderId ? `<div class="card-order-id">#${esc(o.orderId)}</div>` : ''}
+            <div class="card-meta">
+              ${o.orderId ? `<div class="card-order-id">#${esc(o.orderId)}</div>` : ''}
+              ${o.datetime ? `<div class="card-datetime">🕐 ${esc(o.datetime)}</div>` : o.ts ? `<div class="card-datetime">🕐 ${new Date(o.ts).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+            </div>
           </div>
           <div class="card-actions">
             ${!dn ? `<button class="btn-icon" onclick="move('${o.id}',-1)" title="Move up">↑</button>
@@ -255,13 +264,15 @@
     }
 
     let added = 0;
+    let skipped = 0;
     orders.forEach(o => {
+      // Duplicate check: if order ID exists anywhere in the queue (done or not), skip it
       const exists = o.orderId && queue.some(q => q.orderId === o.orderId);
-      if (!exists) {
-        queue.push({ id: uid(), customer: o.customer, item: o.item, notes: '', orderId: o.orderId, done: false, ts: Date.now() });
-        added++;
-      }
+      if (exists) { skipped++; return; }
+      queue.push({ id: uid(), customer: o.customer, item: o.item, notes: '', orderId: o.orderId, datetime: o.datetime||'', done: false, ts: Date.now() });
+      added++;
     });
+    if (skipped > 0) showToast(`⚠ ${skipped} duplicate order${skipped>1?'s':''} skipped`, 'warn');
 
     if (added > 0) {
       save(); render(); playSound();
@@ -329,9 +340,16 @@
           if (l.length > 2) { customer = l; break; }
         }
 
+        // Extract date/time near this order ID
+        let datetime = '';
+        const dateMatch = afterChunk.match(/(\d{2}\/\d{2}\/\d{4})/);
+        const timeMatch = afterChunk.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+        if (dateMatch && timeMatch) datetime = dateMatch[1] + ' ' + timeMatch[1];
+        else if (dateMatch) datetime = dateMatch[1];
+
         if (item) {
           seen[oid] = true;
-          orders.push({ item, customer: customer||'?', orderId: oid });
+          orders.push({ item, customer: customer||'?', orderId: oid, datetime });
         }
       });
     }
