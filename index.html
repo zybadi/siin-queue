@@ -485,8 +485,8 @@
       });
       const itemLines = itemOrder.map(name =>
         itemCounts[name] > 1
-          ? `<span style="display:flex;justify-content:space-between;gap:12px;"><span>${esc(name)}</span><span style="color:var(--blue);font-weight:600;flex-shrink:0;">×${itemCounts[name]}</span></span>`
-          : `<span>${esc(name)}</span>`
+          ? `<span style="display:block;">${esc(name)} <span style="color:var(--blue);font-weight:700;">×${itemCounts[name]}</span></span>`
+          : `<span style="display:block;">${esc(name)}</span>`
       ).join('');
 
       // Order IDs
@@ -634,13 +634,16 @@
     // Lines to always skip — headers, labels, prices, statuses, order types
     const isJunk = l =>
       !l || l.length < 2 ||
-      /^(SAR\s|ITEM NAME|CUSTOMERS|DATES|TYPE|PRICE|PAYOUT|PAYMENT|SHIPPING|EARNING|Order Date|Seller Hub|Home|Orders|Ratings|Cancelled|Pending|Shipments|Live Shows|OBS|Tutorial|Filter|All$|In Progress|Completed)/i.test(l) ||
-      /^(Buy now|Live Buy now|Chatting|Ripping|Shipping|Paid|Delivered|Added To Wallet|Pending Shipping)/i.test(l) ||
-      /^\d{2}\/\d{2}\/\d{4}$/.test(l) ||   // date only line
-      /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(l) || // time only line
+      /^(SAR\s|ITEM NAME|CUSTOMERS|DATES|TYPE|PRICE|PAYOUT|PAYMENT|SHIPPING|EARNING STATUS)/i.test(l) ||
+      /^(Order Date|Order Time|Order ID|Order No|Seller Hub|Home|Orders|Ratings|Cancelled|Shipments|Live Shows|OBS|Tutorial|Filter)/i.test(l) ||
+      /^(All|In Progress|Completed|Pending Shipping)$/.test(l) ||
+      /^(Buy now|Live Buy now|Chatting|Ripping|Paid|Delivered|Added To Wallet|Pending Shipping)/i.test(l) ||
+      /^\d{2}\/\d{2}\/\d{4}$/.test(l) ||    // bare date line
+      /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(l) || // bare time line
       /^SAR\s*[\d.,]+/.test(l) ||               // price line
       /^[0-9]+ - [0-9]+ of [0-9]+/.test(l) ||   // pagination line
-      l.length > 100;                             // too long to be a name/item
+      /^(Zybadi|LIVE QUEUE|LIVE ORDER|Import|Add Manually|Clear|Oldest|Newest)/i.test(l) || // our own app UI
+      l.length > 120;                             // too long
 
     // Split entire page text into clean lines
     const allLines = text.split('\n').map(l => l.trim());
