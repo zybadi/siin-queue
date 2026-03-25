@@ -476,12 +476,18 @@
       const cur = g.id === currentId, dn = g.done;
       const qty = g.items.length;
 
-      // Smart item label: group same items with count
+      // Smart item label: each unique item on its own line with quantity
       const itemCounts = {};
-      g.items.forEach(it => { itemCounts[it.item] = (itemCounts[it.item]||0)+1; });
-      const itemStr = Object.entries(itemCounts)
-        .map(([name, cnt]) => cnt > 1 ? `${name} ×${cnt}` : name)
-        .join(', ');
+      const itemOrder = [];
+      g.items.forEach(it => {
+        if (!itemCounts[it.item]) itemOrder.push(it.item);
+        itemCounts[it.item] = (itemCounts[it.item]||0)+1;
+      });
+      const itemLines = itemOrder.map(name =>
+        itemCounts[name] > 1
+          ? `<span style="display:flex;justify-content:space-between;gap:12px;"><span>${esc(name)}</span><span style="color:var(--blue);font-weight:600;flex-shrink:0;">×${itemCounts[name]}</span></span>`
+          : `<span>${esc(name)}</span>`
+      ).join('');
 
       // Order IDs
       const ids = g.items.map(it => it.orderId).filter(Boolean);
@@ -503,7 +509,7 @@
           <div class="card-position">${i+1}</div>
           <div class="card-info">
             <div class="card-customer">${esc(g.customer)}</div>
-            <div class="card-item">${esc(itemStr)}</div>
+            <div class="card-item" style="display:flex;flex-direction:column;gap:3px;">${itemLines}</div>
             ${qty > 1 ? `<div class="card-qty">📦 ${qty} Orders</div>` : ''}
             <div class="card-meta">
               <div class="card-ids" style="display:flex;gap:4px;flex-wrap:wrap;">
@@ -591,8 +597,22 @@
     });
 
     // Append new groups after existing pending, before done
+    // Cross-page grouping: if the first new group's customer matches
+    // the last existing pending group, merge their items (same customer
+    // ordering across pages counts as one continuous group)
     const pending = queue.filter(g => !g.done);
     const done = queue.filter(g => g.done);
+
+    if (groups.length > 0 && pending.length > 0) {
+      const lastPending = pending[pending.length - 1];
+      const firstNew = groups[0];
+      if (lastPending.customer === firstNew.customer) {
+        // Merge first new group's items into the last pending group
+        lastPending.items.push(...firstNew.items);
+        groups.shift(); // remove the first group since it's now merged
+      }
+    }
+
     queue = [...pending, ...groups, ...done];
 
     save(); render(); playSound();
