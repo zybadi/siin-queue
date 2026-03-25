@@ -467,6 +467,9 @@
       const ta = getGroupTime(a), tb = getGroupTime(b);
       return sortOrder === 'asc' ? ta - tb : tb - ta;
     });
+    // Rebuild queue with sorted pending so currentId (first pending) is correct
+    queue = [...pending, ...done];
+    save();
     const currentId = pending.length ? pending[0].id : null;
 
     list.innerHTML = queue.map((g, i) => {
@@ -609,20 +612,24 @@
       let item = '', customer = '';
 
       // Item name: last valid line before the order ID
+      // Must not be a date, order ID, price, column header, or order type line
+      const skipItem = /^(SAR|Item Name|Customer|Date|Type|Price|Payout|Payment|Ship|Earn|All|Pending|Completed|Filter|Orders|ITEM|CUSTOMER|Buy now|Live Buy now|Chatting|Ripping|Delivered|Added|Paid)/i;
       for (let i = lines.length - 1; i >= 0; i--) {
         const l = lines[i];
         if (/#\d+/.test(l)) continue;
         if (/^\d{2}\/\d{2}\/\d{4}/.test(l)) continue;
-        if (/^(SAR|Item Name|Customer|Date|Type|Price|Payout|Payment|Ship|Earn|All|Pending|Completed|Filter|Orders|ITEM|CUSTOMER)/i.test(l)) continue;
+        if (/^\d{1,2}:\d{2}/.test(l)) continue;
+        if (skipItem.test(l)) continue;
         if (l.length > 3) { item = l; break; }
       }
 
       // Customer: first valid line after the order ID
+      // Must not be a date, time, price, or order-type line
+      const skipCustomer = /^(SAR|Buy now|Live Buy now|Chatting|Ripping|Paid|Delivered|Added To Wallet|Pending|In Progress|\d{2}\/\d{2}\/\d{4}|\d{1,2}:\d{2})/i;
       for (let i = 1; i < afterLines.length; i++) {
         const l = afterLines[i];
         if (/#\d+/.test(l)) break;
-        if (/^\d{2}\/\d{2}\/\d{4}/.test(l)) continue;
-        if (/^(SAR|Buy|Live|Chat|Paid|Delivered|Added|Pending|In Progress|Chatting|Ripping)/i.test(l)) continue;
+        if (skipCustomer.test(l)) continue;
         if (l.length > 2) { customer = l; break; }
       }
 
