@@ -310,84 +310,37 @@ var ch=new BroadcastChannel('siin_queue');
 var orders=[];
 var seen={};
 
-function clean(s){ return (s||'').replace(/\\s+/g,' ').trim(); }
-
-function pushOrder(item,customer,oid){
-  if(!item) return;
-  var k=oid||(item+'|'+customer);
-  if(seen[k]) return; seen[k]=true;
-  orders.push({item:item, customer:customer||'?', orderId:oid||'', notes:''});
-}
-
-// ── STRATEGY 1: Siin seller dashboard table (a.siin.shop/seller-dashboard/orders)
-// The table has columns: Item Name | Customers | Dates | Type | Price | Payout | Payment | Shipping | Earning Status
-// Each row is a <tr> inside a table body
-var rows = document.querySelectorAll('table tr');
+// Target exact Siin HTML structure:
+// Each row is a <tr> in tbody
+// Col 0 td: item name in <p class="...text-black..."> and order id in <p class="...text-secondary-300...">
+// Col 1 td: customer name in <p class="...text-dark-100...">
+var rows=document.querySelectorAll('tbody tr');
 rows.forEach(function(r){
-  var cells = r.querySelectorAll('td');
-  if(cells.length < 2) return;
-  // col 0 = item name + order id underneath
-  var itemCell = cells[0];
-  var customerCell = cells[1];
-  var itemName = clean(itemCell ? itemCell.querySelector('a,span,div,p') ? itemCell.querySelector('a,span,div,p').innerText : itemCell.innerText : '');
-  if(!itemName) itemName = clean(itemCell ? itemCell.innerText : '');
-  var customerName = clean(customerCell ? customerCell.innerText : '');
-  // order id is usually like #3432108 somewhere in col 0
-  var oidMatch = (itemCell ? itemCell.innerText : '').match(/#(\\d+)/);
-  var oid = oidMatch ? oidMatch[1] : '';
-  // strip order id from item name if it got included
-  itemName = itemName.replace(/#\\d+/g,'').trim();
-  pushOrder(itemName, customerName, oid);
+  var tds=r.querySelectorAll('td');
+  if(tds.length<2) return;
+  // Item name: first <p> inside col 0 that has font-medium and text-black
+  var itemEl=tds[0].querySelector('p.font-medium');
+  var item=(itemEl?itemEl.innerText:'').trim();
+  if(!item) return;
+  // Order ID: <p> with text-secondary-300 inside col 0
+  var oidEl=tds[0].querySelector('p.text-secondary-300, p.text-gray-400');
+  var oid=(oidEl?oidEl.innerText:'').replace(/[^0-9]/g,'');
+  // Customer: last <p> inside col 1
+  var custEl=tds[1].querySelector('p.font-medium');
+  var customer=(custEl?custEl.innerText:'?').trim();
+  // Deduplicate by order ID
+  var key=oid||item+'|'+customer;
+  if(seen[key]) return;
+  seen[key]=true;
+  orders.push({item:item,customer:customer,orderId:oid,notes:''});
 });
 
-// ── STRATEGY 2: If Siin renders as divs/cards instead of a real table
 if(!orders.length){
-  // Look for repeating sibling containers that each hold an order
-  var candidates = document.querySelectorAll('[class*="TableRow"],[class*="table-row"],[class*="OrderRow"],[class*="order-row"],[class*="list-item"],[class*="ListItem"],[class*="item-row"],[class*="ItemRow"]');
-  candidates.forEach(function(el){
-    var text = el.innerText;
-    var lines = text.split('\\n').map(function(l){return l.trim();}).filter(Boolean);
-    if(lines.length < 2) return;
-    var oidMatch = text.match(/#(\\d+)/);
-    var oid = oidMatch ? oidMatch[1] : '';
-    var item = lines[0].replace(/#\\d+/g,'').trim();
-    var customer = lines[1];
-    pushOrder(item, customer, oid);
-  });
-}
-
-// ── STRATEGY 3: Nuclear fallback — grab all text nodes that look like order rows
-if(!orders.length){
-  // Find all elements whose text contains a # order number pattern
-  var allEls = document.querySelectorAll('*');
-  var rowEls = [];
-  allEls.forEach(function(el){
-    if(el.children.length > 0) return; // leaf nodes only
-    var t = el.innerText||'';
-    if(/#\\d{5,}/.test(t)) rowEls.push(el);
-  });
-  // Group by closest shared parent
-  rowEls.forEach(function(el){
-    var parent = el.closest('tr,li,[class*="row"],[class*="card"],[class*="item"]') || el.parentElement;
-    if(!parent) return;
-    var text = parent.innerText;
-    var oidMatch = text.match(/#(\\d+)/);
-    var oid = oidMatch ? oidMatch[1] : '';
-    var lines = text.split('\\n').map(function(l){return l.trim();}).filter(Boolean);
-    if(lines.length<1) return;
-    var item = lines[0].replace(/#\\d+/g,'').trim();
-    var customer = lines.length>1 ? lines[1] : '?';
-    pushOrder(item, customer, oid);
-  });
-}
-
-if(!orders.length){
-  alert('Could not detect orders on this page.\\n\\nMake sure you are on:\\na.siin.shop/seller-dashboard/orders\\n\\nThen try again, or use the manual Add form in the queue tab.');
+  alert('No orders found.\\nMake sure you are on hub.siin.shop/seller-dashboard/orders and the page has loaded fully.');
   return;
 }
-
-ch.postMessage({type:'SIIN_ORDERS', orders:orders});
-alert('Sent '+orders.length+' order(s) to your queue tab!');
+ch.postMessage({type:'SIIN_ORDERS',orders:orders});
+alert('✓ Sent '+orders.length+' order(s) to your queue tab!');
 })();`;
 
   document.getElementById('bookmarklet-link').href = bm;
