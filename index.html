@@ -484,9 +484,7 @@
         itemCounts[it.item] = (itemCounts[it.item]||0)+1;
       });
       const itemLines = itemOrder.map(name =>
-        itemCounts[name] > 1
-          ? `<span style="display:block;">${esc(name)} <span style="color:var(--blue);font-weight:700;">×${itemCounts[name]}</span></span>`
-          : `<span style="display:block;">${esc(name)}</span>`
+        `<span style="display:block;">${esc(name)} <span style="color:var(--blue);font-weight:700;">×${itemCounts[name]}</span></span>`
       ).join('');
 
       // Order IDs
@@ -603,18 +601,36 @@
     const pending = queue.filter(g => !g.done);
     const done = queue.filter(g => g.done);
 
-    // Strip emojis/flags for comparison — customer names may include flag emojis
-    // e.g. "ahmad9400 🇶🇦" should match "ahmad9400 🇶🇦" but also handle encoding differences
     const normCustomer = s => s.replace(/[\u{1F1E0}-\u{1F1FF}\u{1F300}-\u{1FFFF}\u{2600}-\u{27BF}]/gu, '').trim().toLowerCase();
 
     if (groups.length > 0 && pending.length > 0) {
       const lastPending = pending[pending.length - 1];
+      const firstPending = pending[0];
       const firstNew = groups[0];
-      // Compare normalized names (strip flags, lowercase, trim)
+      const lastNew = groups[groups.length - 1];
+
+      // Case 1: importing page 2 after page 1
+      // Last existing pending group matches first new group (new orders continue from where we left off)
       if (normCustomer(lastPending.customer) === normCustomer(firstNew.customer)) {
-        // Same customer continuing across pages — merge into existing group
         lastPending.items.push(...firstNew.items);
         groups.shift();
+      }
+      // Case 2: importing page 1 after page 2
+      // Last new group (oldest in new import) matches first existing pending group (oldest already in queue)
+      // This means the new import goes BEFORE the existing queue, so prepend and merge
+      else if (normCustomer(lastNew.customer) === normCustomer(firstPending.customer)) {
+        firstPending.items.unshift(...lastNew.items);
+        groups.pop();
+        // New groups go before existing pending since they're older
+        queue = [...groups, ...pending, ...done];
+        save(); render(); playSound();
+        const totalOrders = newOrders.length;
+        const g2 = groups.length;
+        showToast(
+          '✓ ' + (g2 > 0 ? g2 + ' group' + (g2>1?'s':'') + ' · ' : '') + totalOrders + ' order' + (totalOrders>1?'s':'') +
+          (skipped ? ' · ' + skipped + ' duplicate' + (skipped>1?'s':'') + ' skipped' : '')
+        );
+        return;
       }
     }
 
