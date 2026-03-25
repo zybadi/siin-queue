@@ -476,12 +476,18 @@
       const cur = g.id === currentId, dn = g.done;
       const qty = g.items.length;
 
-      // Smart item label: group same items with count
+      // Smart item label: each unique item on its own line with quantity
       const itemCounts = {};
-      g.items.forEach(it => { itemCounts[it.item] = (itemCounts[it.item]||0)+1; });
-      const itemStr = Object.entries(itemCounts)
-        .map(([name, cnt]) => cnt > 1 ? `${name} ×${cnt}` : name)
-        .join(', ');
+      const itemOrder = [];
+      g.items.forEach(it => {
+        if (!itemCounts[it.item]) itemOrder.push(it.item);
+        itemCounts[it.item] = (itemCounts[it.item]||0)+1;
+      });
+      const itemLines = itemOrder.map(name =>
+        itemCounts[name] > 1
+          ? `<span style="display:block;">${esc(name)} <span style="color:var(--blue);font-weight:700;">×${itemCounts[name]}</span></span>`
+          : `<span style="display:block;">${esc(name)}</span>`
+      ).join('');
 
       // Order IDs
       const ids = g.items.map(it => it.orderId).filter(Boolean);
@@ -503,7 +509,7 @@
           <div class="card-position">${i+1}</div>
           <div class="card-info">
             <div class="card-customer">${esc(g.customer)}</div>
-            <div class="card-item">${esc(itemStr)}</div>
+            <div class="card-item" style="display:flex;flex-direction:column;gap:3px;">${itemLines}</div>
             ${qty > 1 ? `<div class="card-qty">📦 ${qty} Orders</div>` : ''}
             <div class="card-meta">
               <div class="card-ids" style="display:flex;gap:4px;flex-wrap:wrap;">
@@ -591,8 +597,22 @@
     });
 
     // Append new groups after existing pending, before done
+    // Cross-page grouping: if the first new group's customer matches
+    // the last existing pending group, merge their items (same customer
+    // ordering across pages counts as one continuous group)
     const pending = queue.filter(g => !g.done);
     const done = queue.filter(g => g.done);
+
+    if (groups.length > 0 && pending.length > 0) {
+      const lastPending = pending[pending.length - 1];
+      const firstNew = groups[0];
+      if (lastPending.customer === firstNew.customer) {
+        // Merge first new group's items into the last pending group
+        lastPending.items.push(...firstNew.items);
+        groups.shift(); // remove the first group since it's now merged
+      }
+    }
+
     queue = [...pending, ...groups, ...done];
 
     save(); render(); playSound();
@@ -605,71 +625,70 @@
   }
 
   // ── PARSE ORDERS FROM COPIED PAGE TEXT ──
-  // Based on Siin's real copied text structure per row:
-  // ItemName\n#OrderID\nCustomerName [flag]\nDD/MM/YYYY\nHH:MM PM\nBuy type\nChatting...\nSAR xx\n...
+  // Real Siin copied text structure per order:
+  // ItemName\n#OrderID\n\nCustomerName 🇰🇼\nDD/MM/YYYY\nHH:MM PM\nBuy type\nChatting...\nSAR xx\n...
+  // Followed by a side panel "Order Details" block at the end which must be ignored.
   function parseOrders(text) {
     const orders = [];
     const seen = {};
 
-    // Lines to always skip — headers, labels, prices, statuses, order types
-    const isJunk = l =>
-      !l || l.length < 2 ||
-      /^(SAR\s|ITEM NAME|CUSTOMERS|DATES|TYPE|PRICE|PAYOUT|PAYMENT|SHIPPING|EARNING|Order Date|Seller Hub|Home|Orders|Ratings|Cancelled|Pending|Shipments|Live Shows|OBS|Tutorial|Filter|All$|In Progress|Completed)/i.test(l) ||
-      /^(Buy now|Live Buy now|Chatting|Ripping|Shipping|Paid|Delivered|Added To Wallet|Pending Shipping)/i.test(l) ||
-      /^\d{2}\/\d{2}\/\d{4}$/.test(l) ||   // date only line
-      /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(l) || // time only line
-      /^SAR\s*[\d.,]+/.test(l) ||               // price line
-      /^[0-9]+ - [0-9]+ of [0-9]+/.test(l) ||   // pagination line
-      l.length > 100;                             // too long to be a name/item
+    // Strip everything from "Order Details" onwards — this is the side panel
+    // that Siin always shows on the right and gets copied too
+    const cutoff = text.indexOf('\nOrder Details\n');
+    const cleanText = cutoff !== -1 ? text.substring(0, cutoff) : text;
 
-    // Split entire page text into clean lines
-    const allLines = text.split('\n').map(l => l.trim());
+    // Also strip the header block (everything before the first order ID)
+    // The table headers end with "EARNING STATUS" then the first item starts
+    const tableStart = cleanText.indexOf('EARNING STATUS');
+    const ordersText = tableStart !== -1 ? cleanText.substring(tableStart + 'EARNING STATUS'.length) : cleanText;
 
-    // Find all order ID positions within the lines array
-    // Each order ID line looks like "#3432108"
-    const orderLineIndexes = [];
-    allLines.forEach((l, i) => {
-      if (/^#(\d{5,})$/.test(l)) orderLineIndexes.push(i);
-    });
+    // Split into lines
+    const lines = ordersText.split('\n').map(l => l.trim());
 
-    orderLineIndexes.forEach(idx => {
-      const oidLine = allLines[idx];
-      const oid = oidLine.replace('#','').trim();
-      if (seen[oid]) return;
+    // Walk line by line. Pattern repeats as:
+    // [item name] -> [#orderID] -> [blanks] -> [customer] -> [date] -> [time] -> [type] -> [chatting...] -> [SAR] -> ...
+    let i = 0;
+    while (i < lines.length) {
+      const l = lines[i];
 
-      // Item name: look BACKWARDS from the order ID line for first non-junk line
-      let item = '';
-      for (let i = idx - 1; i >= Math.max(0, idx - 10); i--) {
-        const l = allLines[i];
-        if (isJunk(l)) continue;
-        if (/^#\d+$/.test(l)) break; // hit another order ID — stop
-        item = l;
-        break;
+      // Detect order ID line: exactly "#" followed by 5+ digits
+      if (/^#(\d{5,})$/.test(l)) {
+        const oid = l.replace('#', '');
+
+        // Item name is the last non-empty line BEFORE this order ID
+        let item = '';
+        for (let j = i - 1; j >= 0; j--) {
+          if (lines[j].trim()) { item = lines[j].trim(); break; }
+        }
+
+        // Customer is the first non-empty line AFTER the order ID (skip blanks)
+        let customer = '';
+        let datetime = '';
+        for (let j = i + 1; j < Math.min(lines.length, i + 10); j++) {
+          const nl = lines[j].trim();
+          if (!nl) continue;
+          // Skip if it looks like another order ID
+          if (/^#\d{5,}$/.test(nl)) break;
+          // First non-empty non-ID line after order ID = customer
+          if (!customer) { customer = nl; continue; }
+          // Second non-empty = date
+          if (!datetime && /^\d{2}\/\d{2}\/\d{4}$/.test(nl)) { datetime = nl; continue; }
+          // Third non-empty after date = time
+          if (datetime && /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(nl)) {
+            datetime = datetime + ' ' + nl;
+            break;
+          }
+          // If we hit SAR or Buy now etc, stop looking
+          if (/^(SAR|Buy now|Live Buy now|Chatting)/i.test(nl)) break;
+        }
+
+        if (item && !seen[oid]) {
+          seen[oid] = true;
+          orders.push({ item, customer: customer || '?', orderId: oid, datetime });
+        }
       }
-
-      // Customer: look FORWARDS from the order ID line for first non-junk line
-      let customer = '';
-      for (let i = idx + 1; i < Math.min(allLines.length, idx + 15); i++) {
-        const l = allLines[i];
-        if (/^#\d+$/.test(l)) break; // hit next order ID — stop
-        if (isJunk(l)) continue;
-        customer = l;
-        break;
-      }
-
-      // Date + time: scan forward from order ID
-      let datetime = '';
-      const forwardBlock = allLines.slice(idx, Math.min(allLines.length, idx + 20)).join('\n');
-      const dateM = forwardBlock.match(/(\d{2}\/\d{2}\/\d{4})/);
-      const timeM = forwardBlock.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
-      if (dateM && timeM) datetime = dateM[1] + ' ' + timeM[1].trim();
-      else if (dateM) datetime = dateM[1];
-
-      if (item) {
-        seen[oid] = true;
-        orders.push({ item, customer: customer || '?', orderId: oid, datetime });
-      }
-    });
+      i++;
+    }
 
     return orders;
   }
